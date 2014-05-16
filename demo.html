@@ -1,0 +1,72 @@
+<!doctype html>
+<!-- Copyright (c) 2014 Google Inc. All rights reserved. -->
+<html>
+<head>
+  <title>google-sheets Demo</title>
+  <script src="../platform/platform.js"></script>
+  <link rel="import" href="google-sheets.html">
+  <style>
+    pre {
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body unresolved>
+
+<p>A <code>&lt;google-sheets></code> renders data from Google Spreadsheets.</p>
+
+<pre>
+&lt;google-sheets key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" ispublished>&lt;/google-sheets>
+</pre>
+
+<!-- Published spreadsheet -->
+<google-sheets key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" ispublished></google-sheets>
+
+<template id="cellrows" bind>
+  <heading>
+    <h2><a href="{{openInGoogleDocsURL}}" target="_blank" title="Open in Google Docs &rarr;">{{title}}{{tabTitle}}</a></h2>
+    <small>updated: {{updated}}</small>
+    <h4>by: <template repeat="{{authors}}">{{email}} </template></h4>
+  </heading>
+  <ul>
+    <template repeat="{{rows}}">
+      <li>Name: {{gsx$name.$t}}
+        <ul>
+          <li>Lat: {{gsx$lat.$t}}</li>
+          <li>Lng: {{gsx$lng.$t}}</li>
+        </ul>
+      </li>
+    </template>
+  </ul>
+</template>
+
+<script>
+function onData(e) {
+  // TODO(ericbidelman): figure out why adding another <google-sheets> to page defaults
+  // this object to last instance.
+  // Problem is in google-signin: https://github.com/GoogleWebComponents/google-signin/issues/8
+
+  switch (e.detail.type) {
+    case 'spreadsheet':
+      if (this == sheet1) {
+        document.querySelector('#spreadsheetlist').model = this;
+      }
+      break;
+    case 'cellrows':
+      document.querySelector('#cellrows').model = this;
+      break;
+    default:
+      break;
+  }
+}
+
+function onError(e) {
+  alert(e.detail.response);
+}
+
+var sheet = document.querySelector('google-sheets');
+sheet.addEventListener('google-sheet-data', onData);
+sheet.addEventListener('core-error', onError);
+</script>
+</body>
+</html>
