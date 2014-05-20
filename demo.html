@@ -47,11 +47,6 @@ function onData(e) {
   // Problem is in google-signin: https://github.com/GoogleWebComponents/google-signin/issues/8
 
   switch (e.detail.type) {
-    case 'spreadsheet':
-      if (this == sheet1) {
-        document.querySelector('#spreadsheetlist').model = this;
-      }
-      break;
     case 'cellrows':
       document.querySelector('#cellrows').model = this;
       break;
