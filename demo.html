@@ -60,7 +60,11 @@
 
   <template id="rows" bind>
     <heading>
-      <h3>Spreadsheet rows: <a href="{{openInGoogleDocsURL}}" target="_blank" title="Open in Google Docs &rarr;">"{{tab.title}}" tab</a></h3>
+      <h3>Spreadsheet rows:
+        <a href="{{openInGoogleDocsURL}}" target="_blank" title="Open in Google Docs &rarr;">
+          "{{tab.title}}" tab
+        </a>
+      </h3>
       <h5>updated: {{tab.updated}}, by: <template repeat="{{rows.authors}}">{{name}} </template></h5>
     </heading>
     <ul>
