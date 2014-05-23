@@ -6,63 +6,122 @@
   <title>google-sheets Demo</title>
   <script src="../platform/platform.js"></script>
   <link rel="import" href="google-sheets.html">
+  <link rel="import" href="../google-map/google-map.html">
   <style>
-    pre {
-      font-size: 18px;
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 2em;
+      font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial;
+      font-weight: 300;
+      background-color: #f1f1f3;
+    }
+    a {
+      text-decoration: none;
+      color: blue;
+    }
+    ul {
+      padding-left: 0;
+    }
+    ul, li {
+      list-style: none;
+      font-size: 14px;
+    }
+    section {
+      border-radius: 3px;
+      box-shadow: 1px 1px 3px #ccc;
+      padding: 1em 2em;
+      background-color: white;
+      width: 500px;
+      height: 500px;
+    }
+    google-map {
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
+    main {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 2em;
     }
   </style>
 </head>
 <body unresolved>
 
-<p>A <code>&lt;google-sheets></code> renders data from Google Spreadsheets.</p>
+<p>A <code>&lt;google-sheets></code> element returns data from a Google Spreadsheet:</p>
 
-<pre>
-&lt;google-sheets key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" ispublished>&lt;/google-sheets>
-</pre>
+<!-- Example: published spreadsheet -->
+<google-sheets id="sheet" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" published></google-sheets>
 
-<!-- Published spreadsheet -->
-<google-sheets key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" ispublished></google-sheets>
+<main>
 
-<template id="cellrows" bind>
-  <heading>
-    <h2><a href="{{openInGoogleDocsURL}}" target="_blank" title="Open in Google Docs &rarr;">{{title}}{{tabTitle}}</a></h2>
-    <small>updated: {{updated}}</small>
-    <h4>by: <template repeat="{{authors}}">{{email}} </template></h4>
-  </heading>
-  <ul>
-    <template repeat="{{rows}}">
-      <li>Name: {{gsx$name.$t}}
-        <ul>
-          <li>Lat: {{gsx$lat.$t}}</li>
-          <li>Lng: {{gsx$lng.$t}}</li>
-        </ul>
-      </li>
-    </template>
-  </ul>
-</template>
+<section>
+
+  <template id="rows" bind>
+    <heading>
+      <h3>Spreadsheet rows:
+        <a href="{{openInGoogleDocsURL}}" target="_blank" title="Open in Google Docs &rarr;">
+          "{{tab.title}}" tab
+        </a>
+      </h3>
+      <h5>updated: {{tab.updated}}, by: <template repeat="{{rows.authors}}">{{name}} </template></h5>
+    </heading>
+    <ul>
+      <template repeat="{{rows}}">
+        <li>Name: {{gsx$name.$t}} ( lat: {{gsx$lat.$t}}, lng: {{gsx$lng.$t}} )</li>
+      </template>
+    </ul>
+  </template>
+
+</section>
+
+<section style="padding: 0;">
+
+  <!-- Example of using Polymer's <template is="auto-binding"> -->
+  <template is="auto-binding">
+    <google-sheets key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" rows="{{rows}}" published></google-sheets>
+    <google-map disableDefaultUI fittomarkers>
+      <template repeat="{{row in rows}}">
+        <google-map-marker latitude="{{row.gsx$lat.$t}}" longitude="{{row.gsx$lng.$t}}"></google-map-marker>
+      </template>
+    </google-map>
+  </template>
+
+</section>
+
+</main>
+
+<!-- Example: private spreadsheet -->
+<!-- <google-sheets id="sheet"
+         clientId="750497606405-1hq66meqmr4dp09dn54j9ggv85vbv0gp.apps.googleusercontent.com"
+         key="0Anye-JMjUkZZdDdSR2ZXMW5SVjRid19vUTdnRXA2cXc"></google-sheets>
+-->
 
 <script>
-function onData(e) {
-  // TODO(ericbidelman): figure out why adding another <google-sheets> to page defaults
-  // this object to last instance.
-  // Problem is in google-signin: https://github.com/GoogleWebComponents/google-signin/issues/8
+var sheet = document.querySelector('#sheet');
+
+sheet.addEventListener('google-sheet-data', function(e) {
+  // TODO(ericbidelman): adding another <google-sheets> to page defaults
+  // `this` object to last instance. Problem is with google-signin:
+  // https://github.com/GoogleWebComponents/google-signin/issues/8
 
   switch (e.detail.type) {
-    case 'cellrows':
-      document.querySelector('#cellrows').model = this;
+    case 'spreadsheets':
+      // Noop. Just shown as an example.
+      break;
+    case 'rows':
+      document.querySelector('#rows').model = this;
       break;
     default:
       break;
   }
-}
+});
 
-function onError(e) {
+sheet.addEventListener('core-error', function(e) {
   alert(e.detail.response);
-}
-
-var sheet = document.querySelector('google-sheets');
-sheet.addEventListener('google-sheet-data', onData);
-sheet.addEventListener('core-error', onError);
+});
 </script>
 </body>
 </html>
