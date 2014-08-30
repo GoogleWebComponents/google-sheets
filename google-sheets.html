@@ -72,8 +72,8 @@ Fired when the spreadsheet's cell information is available.
        https://github.com/GoogleWebComponents/google-signin/issues/7 is fixed. -->
   <template if="{{!published}}">
     <google-signin clientId="{{clientId}}" scopes="https://spreadsheets.google.com/feeds"
-                 on-google-signin-success="{{onSignInSuccess}}"
-                 on-google-signin-failure="{{onSignInFail}}"></google-signin>
+                   on-google-signin-success="{{onSignInSuccess}}"
+                   on-google-signin-failure="{{onSignInFail}}"></google-signin>
   </template>
 
   <core-ajax id="publicajax" auto params='{"alt": "json"}' handleAs="json"
@@ -216,7 +216,9 @@ Fired when the spreadsheet's cell information is available.
       this.spreadsheets = this.spreadsheets || [];
     },
 
-    ready: function() {
+    keyChanged: function() {
+      // TODO(ericbidelman): need to better handle updates to the key attribute.
+      // Below doesn't account for private feeds.
       if (this.published) {
         var url = SCOPE_ + '/list/' + this.key + '/' +
                   gid_to_wid_(this.gid) + '/public/values';

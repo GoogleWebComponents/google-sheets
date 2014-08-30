@@ -34,12 +34,7 @@
       padding: 1em 2em;
       background-color: white;
       width: 500px;
-      height: 500px;
-    }
-    google-map {
-      display: block;
-      height: 100%;
-      width: 100%;
+      min-height: 500px;
     }
     main {
       justify-content: space-around;
@@ -49,12 +44,30 @@
 </head>
 <body unresolved>
 
-<p>A <code>&lt;google-sheets></code> element returns data from a Google Spreadsheet:</p>
+<p>A <code>&lt;google-sheets></code> element returning data from a private Google Spreadsheet:</p>
 
-<!-- Example: published spreadsheet -->
-<google-sheets id="sheet" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" published></google-sheets>
+<!-- Example: private spreadsheet -->
+<google-sheets id="sheet" gid="1"
+       clientId="750497606405-1hq66meqmr4dp09dn54j9ggv85vbv0gp.apps.googleusercontent.com"
+       key="0AjqzxJ5RoRrWdGh2S0RRYURXTlNHdm9pQlFuM1ZwZWc"></google-sheets>
 
 <main layout horizontal>
+
+<section>
+
+  <heading>
+    <h3>List of spreadsheets</h3>
+  </heading>
+
+  <template id="spreadsheets" is="auto-binding">
+    <ul>
+      <template repeat="{{spreadsheets}}">
+        <li>{{title.$t}}</li>
+      </template>
+    </ul>
+  </template>
+
+</section>
 
 <section>
 
@@ -76,27 +89,7 @@
 
 </section>
 
-<section style="padding: 0;">
-
-  <!-- Example of using Polymer's <template is="auto-binding"> -->
-  <template is="auto-binding">
-    <google-sheets key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" rows="{{rows}}" published></google-sheets>
-    <google-map disableDefaultUI fittomarkers>
-      <template repeat="{{row in rows}}">
-        <google-map-marker latitude="{{row.gsx$lat.$t}}" longitude="{{row.gsx$lng.$t}}"></google-map-marker>
-      </template>
-    </google-map>
-  </template>
-
-</section>
-
 </main>
-
-<!-- Example: private spreadsheet -->
-<!-- <google-sheets id="sheet"
-         clientId="750497606405-1hq66meqmr4dp09dn54j9ggv85vbv0gp.apps.googleusercontent.com"
-         key="0Anye-JMjUkZZdDdSR2ZXMW5SVjRid19vUTdnRXA2cXc"></google-sheets>
--->
 
 <script>
 var sheet = document.querySelector('#sheet');
@@ -104,7 +97,7 @@ var sheet = document.querySelector('#sheet');
 sheet.addEventListener('google-sheet-data', function(e) {
   switch (e.detail.type) {
     case 'spreadsheets':
-      // Noop. Just shown as an example.
+      document.querySelector('#spreadsheets').spreadsheets = this.spreadsheets;
       break;
     case 'rows':
       document.querySelector('#rows').model = this;
