@@ -30,12 +30,12 @@ document.addEventListener('polymer-ready', function() {
 
   sheet.addEventListener('google-sheet-data', function(e) {
 
-    if (e.detail.type == 'tab') {
+    if (e.detail.type === 'tab') {
       assert.equal(this.tab.title, 'Locations',
                    'Published spreadsheet title is not correct.');
       assert.isNotNull(this.tab.updated, '.tab.updated was not set');
       assert.isTrue(this.tab.authors.length > 0, '.tab.authors was 0');
-    } else if (e.detail.type == 'rows') {
+    } else if (e.detail.type === 'rows') {
       assert.lengthOf(this.spreadsheets, 0,
         '.spreadsheets length should be 0 since spreadsheet key was given');
       assert.isTrue(this.rows.length > 0, '.rows was not populated');
