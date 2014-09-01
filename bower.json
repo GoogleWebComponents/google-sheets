@@ -1,6 +1,6 @@
 {
   "name": "google-sheets",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "homepage": "http://googlewebcomponents.github.io/google-sheets",
   "description": "Web components to interact with Google Sheets",
   "main": "google-sheets.html",
@@ -26,7 +26,7 @@
   "dependencies": {
     "polymer": "Polymer/polymer#>=0.4.0 <1.0.0",
     "google-apis": "GoogleWebComponents/google-apis#~0.3.2",
-    "google-signin": "GoogleWebComponents/google-signin#~0.0.8",
+    "google-signin": "GoogleWebComponents/google-signin#~0.1.0",
     "core-ajax": "Polymer/core-ajax#>=0.4.0 <1.0.0",
     "google-map": "GoogleWebComponents/google-map#~0.3.1"
   },
