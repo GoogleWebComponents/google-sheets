@@ -300,7 +300,7 @@ Fired when the spreadsheet's cell information is available.
       }
 
       var url = SCOPE_ + '/list/' +
-                this.worksheetId_ + '/' + gid_to_wid_(this.gid) +
+                this.worksheetId_ + '/' + this.tabid +
                 '/private/full';
       this.$.cellrowsajax.url = url;
     },
@@ -329,9 +329,11 @@ Fired when the spreadsheet's cell information is available.
       });
     },
 
-    gidChanged: function() {
+    tabidChanged: function() {
       if (this.worksheetId_) {
         this.getCellRows();
+      } else if (this.published) {
+        this.keyChanged();
       }
     },
 
