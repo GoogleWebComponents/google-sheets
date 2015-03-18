@@ -1,6 +1,6 @@
 {
   "name": "google-sheets",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "homepage": "http://googlewebcomponents.github.io/google-sheets",
   "description": "Web components to interact with Google Sheets",
   "main": "google-sheets.html",
