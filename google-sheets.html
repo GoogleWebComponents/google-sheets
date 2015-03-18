@@ -6,16 +6,15 @@
 Element for interacting with Google Sheets.
 
 `<google-sheets>` pulls cell data from the Google Sheet specified by `key`.
-A spreadsheet's key can be found in the URL when viewing it in google docs (e.g. `docs.google.com/spreadsheet/ccc?key=<KEY>#gid=0`).
+A spreadsheet's key can be found in the URL when viewing it in google docs (e.g. `docs.google.com/spreadsheet/ccc?key=<KEY>#gid=12345`).
 
-Optionally pass the `gid` attribute to specify a particular worksheet tab in the spreadsheet.If `gid` is updated at a later time, the underlying data is also updated. **API calls
-are cached** as to not make extraneous calls.
+Optionally, pass the `tabid` attribute to specify a particular worksheet tab in the spreadsheet. For example, the first tab would be `tabid="1"`. If `tab` is updated at a later time, the underlying data is also updated. **API calls are cached** as to not make extraneous calls.
 
 See [developers.google.com/google-apps/spreadsheets](http://developers.google.com/google-apps/spreadsheets) for full Spreadsheets API documentation.
 
 #### Example
 
-    <google-sheets key="..." gid="0" clientId="..."></google-sheets>
+    <google-sheets key="..." tabid="1" clientId="..."></google-sheets>
 
     <script>
       var sheet = document.querySelector('google-sheets');
@@ -42,7 +41,7 @@ See [developers.google.com/google-apps/spreadsheets](http://developers.google.co
 <b>Example</b> - show a list of Map markers, using data-binding features inside Polymer:
 
     <google-sheets
-      key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" gid="0" rows="{{rows}}"
+      key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tabid="1" rows="{{rows}}"
       clientId="...">
     </google-sheets>
     <google-map>
@@ -66,7 +65,7 @@ Fired when the spreadsheet's cell information is available.
 @param {string} detail.type The type of data that was fetched. One of 'spreadsheets', 'tab', 'rows' to correspond to the feed type.
 -->
 
-<polymer-element name="google-sheets" attributes="clientId key gid published rows">
+<polymer-element name="google-sheets" attributes="clientId key tabid published rows">
 <template>
   <!-- TODO(ericbidelman): remove clientId when
        https://github.com/GoogleWebComponents/google-signin/issues/7 is fixed. -->
@@ -95,7 +94,7 @@ Fired when the spreadsheet's cell information is available.
   var rowDataCache_ = {};
 
   function generateCacheKey_() {
-    return this.worksheetId_ + '_'+ this.gid;
+    return this.worksheetId_ + '_'+ this.tabid;
   }
 
   function getLink_(rel, links) {
@@ -141,16 +140,18 @@ Fired when the spreadsheet's cell information is available.
     key: '',
 
     /**
-     * Sheet within a spreadsheet. For example `docs.google.com/spreadsheet/ccc?key=<KEY>#gid=<GID>`.
+     * Tab within a spreadsheet. For example, the first tab in a spreadsheet
+     * would be `tab="1"`.
      *
-     * @attribute gid
+     * @attribute tabid
      * @type number
-     * @default 0
+     * @default 1
      */
-    gid: 0,
+    tabid: 1,
 
     /**
-     * A hint that the spreadsheet is published publicly in Google Docs. Used as a performance optimization to us the simple
+     * A hint that the spreadsheet is published publicly in Google Docs. Used as a performance optimization.
+     * Make sure the sheet is also publicly viewable by anyone in the Share settings.
      *
      * @attribute published
      * @type boolean
@@ -180,7 +181,7 @@ Fired when the spreadsheet's cell information is available.
       if (this.key) {
         url += 'ccc?key=' + this.key;
       }
-      url += '#gid=' + this.gid;
+      //url += '#gid=' + this.gid;
 
       return url;
     },
@@ -221,7 +222,7 @@ Fired when the spreadsheet's cell information is available.
       // Below doesn't account for private feeds.
       if (this.published) {
         var url = SCOPE_ + '/list/' + this.key + '/' +
-                  gid_to_wid_(this.gid) + '/public/values';
+                  this.tabid + '/public/values';
         this.$.publicajax.url = url;
       }
     },
@@ -237,7 +238,7 @@ Fired when the spreadsheet's cell information is available.
       this.$.worksheetajax.headers = headers;
       this.$.cellrowsajax.headers = headers;
 
-      // TODO(ericbidleman): don't make this call if this.spreadsheets is
+      // TODO(ericbidelman): don't make this call if this.spreadsheets is
       // already populated from another instance.
       this.listSpreadsheets();
     },
@@ -280,7 +281,7 @@ Fired when the spreadsheet's cell information is available.
       }
 
       var url = SCOPE_ + '/worksheets/' + this.worksheetId_ +
-                '/private/full/' + gid_to_wid_(this.gid);
+                '/private/full/' + this.tabid;
       this.$.worksheetajax.url = url;
     },
 
