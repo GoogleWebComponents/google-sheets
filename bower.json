@@ -24,13 +24,13 @@
     "google"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#^0.5.1",
-    "google-apis": "GoogleWebComponents/google-apis#^0.4.2",
-    "google-signin": "GoogleWebComponents/google-signin#~0.1.0",
-    "core-ajax": "Polymer/core-ajax#^0.5.1",
-    "google-map": "GoogleWebComponents/google-map#^0.4.0"
+    "polymer": "Polymer/polymer#^0.5.5",
+    "google-apis": "GoogleWebComponents/google-apis#^0.4.4",
+    "google-signin": "GoogleWebComponents/google-signin#^0.2.1",
+    "core-ajax": "Polymer/core-ajax#^0.5.5"
   },
   "devDependencies": {
+    "google-map": "GoogleWebComponents/google-map#^0.4.2",
     "polymer-test-tools": "Polymer/polymer-test-tools#>=0.4.0 <1.0.0"
   }
 }

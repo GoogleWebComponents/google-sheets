@@ -89,7 +89,7 @@ Fired when the spreadsheet's cell information is available.
 <script>
 (function() {
   var SCOPE_ = 'https://spreadsheets.google.com/feeds';
-  
+
   // Minimal cache for worksheet row data. Shared across instances so subsequent
   // accesses are fast and API calls only happen once.
   var rowDataCache_ = {};
@@ -118,7 +118,7 @@ Fired when the spreadsheet's cell information is available.
     return parseInt((gid ^ 31578)).toString(36);
   }
 
-  Polymer('google-sheets', {
+  Polymer({
 
     /**
      * A Google Developers clientId. Obtain from [console.developers.google.com](https://console.developers.google.com). Required for accessing a private spreadsheet. Optional if accessing a public spreadsheet.
@@ -133,7 +133,7 @@ Fired when the spreadsheet's cell information is available.
      * the document is Google Docs (e.g. `docs.google.com/spreadsheet/ccc?key=<KEY>`).
      *
      * Leaving off this attribute still returns a list of the users spreadsheets in the `spreadsheets` property.
-     * 
+     *
      * @attribute key
      * @type string
      * @default ''
@@ -142,7 +142,7 @@ Fired when the spreadsheet's cell information is available.
 
     /**
      * Sheet within a spreadsheet. For example `docs.google.com/spreadsheet/ccc?key=<KEY>#gid=<GID>`.
-     * 
+     *
      * @attribute gid
      * @type number
      * @default 0
@@ -151,7 +151,7 @@ Fired when the spreadsheet's cell information is available.
 
     /**
      * A hint that the spreadsheet is published publicly in Google Docs. Used as a performance optimization to us the simple
-     * 
+     *
      * @attribute published
      * @type boolean
      * @default false
@@ -162,7 +162,7 @@ Fired when the spreadsheet's cell information is available.
 
     /**
      * List of the user's spreadsheets. Shared across instances.
-     * 
+     *
      * @property spreadsheets
      * @type array
      */
@@ -170,7 +170,7 @@ Fired when the spreadsheet's cell information is available.
 
     /**
      * The URL to open this spreadsheet in Google Sheets.
-     * 
+     *
      * @property openInGoogleDocsURL
      * @readonly
      * @type string
@@ -188,7 +188,7 @@ Fired when the spreadsheet's cell information is available.
     created: function() {
       /**
        * The fetched sheet corresponding to the `key` attribute.
-       * 
+       *
        * @property sheet
        * @type Object
        * @default {}
@@ -197,7 +197,7 @@ Fired when the spreadsheet's cell information is available.
 
       /**
        * Meta data about the particular tab that was retrieved for the spreadsheet.
-       * 
+       *
        * @property tab
        * @type Object
        * @default {}
@@ -206,7 +206,7 @@ Fired when the spreadsheet's cell information is available.
 
       /**
        * If a spreadsheet `key` is specified, returns a list of cell row data.
-       * 
+       *
        * @attribute rows
        * @type array
        * @default []
