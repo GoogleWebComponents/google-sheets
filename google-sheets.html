@@ -218,10 +218,8 @@ Fired when the spreadsheet's cell information is available.
     },
 
     onSignInSuccess: function(e, detail, sender) {
-      var oauthToken = gapi.auth.getToken();
-
       var headers = {
-        'Authorization': 'Bearer ' + oauthToken.access_token
+        'Authorization': 'Bearer ' + detail.user.getAuthResponse().access_token
       };
 
       this.$.listsheetsajax.headers = headers;

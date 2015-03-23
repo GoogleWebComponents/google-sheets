@@ -7,6 +7,7 @@
   <script src="../webcomponentsjs/webcomponents.min.js"></script>
   <link rel="import" href="google-sheets.html">
   <link rel="import" href="../google-map/google-map.html">
+  <link rel="import" href="../google-signin/google-signin.html">
   <style>
     * {
       box-sizing: border-box;
@@ -44,11 +45,15 @@
 </head>
 <body unresolved>
 
+<google-signin
+  clientId="1054047045356-j8pgqgls9vdef3rl09hapoicumbte0bo.apps.googleusercontent.com"
+  scopes="https://spreadsheets.google.com/feeds">
+</google-signin>
+
 <p>A <code>&lt;google-sheets></code> element returning data from a <b>private</b> Google Spreadsheet:</p>
 
 <!-- Example: private spreadsheet -->
 <google-sheets id="sheet" tabid="1"
-       clientId="750497606405-1hq66meqmr4dp09dn54j9ggv85vbv0gp.apps.googleusercontent.com"
        key="1QMGizivw3UJ3-R9BFK7sfrXE0RL87dygk2C0RcuKoDY"></google-sheets>
 
 <main layout horizontal>
