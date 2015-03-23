@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../core-ajax/core-ajax.html">
-<link rel="import" href="../google-signin/google-signin.html">
+<link rel="import" href="../google-signin/google-signin-aware.html">
 
 <!--
 Element for interacting with Google Sheets.
@@ -14,7 +14,7 @@ See [developers.google.com/google-apps/spreadsheets](http://developers.google.co
 
 #### Example
 
-    <google-sheets key="..." tabid="1" clientId="..."></google-sheets>
+    <google-sheets key="..." tabid="1"></google-sheets>
 
     <script>
       var sheet = document.querySelector('google-sheets');
@@ -36,13 +36,12 @@ See [developers.google.com/google-apps/spreadsheets](http://developers.google.co
 
 <b>Example</b> - leaving off the `key` returns as list of the user's spreadsheets.
 
-    <google-sheets clientId="..."></google-sheets>
+    <google-sheets></google-sheets>
 
 <b>Example</b> - show a list of Map markers, using data-binding features inside Polymer:
 
     <google-sheets
-      key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tabid="1" rows="{{rows}}"
-      clientId="...">
+      key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tabid="1" rows="{{rows}}">
     </google-sheets>
     <google-map>
       <template repeat="{{row in rows}}">
@@ -65,14 +64,13 @@ Fired when the spreadsheet's cell information is available.
 @param {string} detail.type The type of data that was fetched. One of 'spreadsheets', 'tab', 'rows' to correspond to the feed type.
 -->
 
-<polymer-element name="google-sheets" attributes="clientId key tabid published rows">
+<polymer-element name="google-sheets" attributes="key tabid published rows">
 <template>
-  <!-- TODO(ericbidelman): remove clientId when
-       https://github.com/GoogleWebComponents/google-signin/issues/7 is fixed. -->
   <template if="{{!published}}">
-    <google-signin clientId="{{clientId}}" scopes="https://spreadsheets.google.com/feeds"
-                   on-google-signin-success="{{onSignInSuccess}}"
-                   on-google-signin-failure="{{onSignInFail}}"></google-signin>
+    <google-signin-aware scopes="https://spreadsheets.google.com/feeds"
+        on-google-signin-aware-success="{{onSignInSuccess}}"
+        on-google-signin-aware-failure="{{onSignInFail}}">
+    </google-signin>
   </template>
 
   <core-ajax id="publicajax" auto params='{"alt": "json"}' handleAs="json"
@@ -118,14 +116,6 @@ Fired when the spreadsheet's cell information is available.
   }
 
   Polymer({
-
-    /**
-     * A Google Developers clientId. Obtain from [console.developers.google.com](https://console.developers.google.com). Required for accessing a private spreadsheet. Optional if accessing a public spreadsheet.
-     *
-     * @attribute clientId
-     * @type string
-     */
-    clientId: '',
 
     /**
      * The key of the spreadsheet. This can be found in the URL when viewing
@@ -361,9 +351,7 @@ Fired when the spreadsheet's cell information is available.
         data: this.tab
       });
     }
-
   });
-
 })();
 </script>
 </polymer-element>
