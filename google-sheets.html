@@ -49,6 +49,11 @@ See [developers.google.com/google-apps/spreadsheets](http://developers.google.co
       </template>
     </google-map>
 
+<b>Example</b> - access to a private spreadsheet requires `<google-signin>`:
+
+    <google-sheets key="..."></google-sheets>
+    <google-signin clientId="..." scopes="https://spreadsheets.google.com/feeds"></google-signin>
+
 @element google-sheets
 @blurb Element for interacting with Google Sheets.
 @status alpha
