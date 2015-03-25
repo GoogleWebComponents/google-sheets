@@ -23,10 +23,9 @@ document.addEventListener('polymer-ready', function() {
   var sheet = document.querySelector('#sheet');
   var root = sheet.shadowRoot;
 
-  assert.equal(sheet.clientId, '', ".clientId should '' for a public sheet");
   assert.isTrue(sheet.published);
-  assert.isNull(root.querySelector('google-signin'),
-      'google-signin should not be created for a published sheet');
+  assert.isNull(root.querySelector('google-signin-aware'),
+      'google-signin-aware should not be created for a published sheet');
 
   sheet.addEventListener('google-sheet-data', function(e) {
 

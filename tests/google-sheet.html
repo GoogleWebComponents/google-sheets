@@ -14,7 +14,7 @@
 </head>
 <body>
 
-<google-sheets id="sheet1" clientId="123"></google-sheets>
+<google-sheets id="sheet1"></google-sheets>
 
 <script>
 document.addEventListener('polymer-ready', function() {
@@ -32,10 +32,9 @@ document.addEventListener('polymer-ready', function() {
 
     assert.equal(sheet.key, '', ".key default is not ''");
     assert.equal(sheet.gid, 0, '.gid default is not 0');
-    assert.equal(sheet.clientId, '123', ".clientId was not set");
     assert.isFalse(sheet.published, '.published does not default to false');
-    assert.isNotNull(root.querySelector('google-signin'),
-        'google-signin should be created for non-public sheet');
+    assert.isNotNull(root.querySelector('google-signin-aware'),
+        'google-signin-aware should be created for non-public sheet');
 
     done();
 
