@@ -1,8 +1,8 @@
 {
   "name": "google-sheets",
   "version": "0.0.5",
-  "homepage": "http://googlewebcomponents.github.io/google-sheets",
   "description": "Web components to interact with Google Sheets",
+  "homepage": "https://googlewebcomponents.github.io/google-sheets",
   "main": "google-sheets.html",
   "authors": [
     "Eric Bidelman <ebidel@gmail.com>"
