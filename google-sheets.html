@@ -25,7 +25,7 @@ See [developers.google.com/google-apps/spreadsheets](https://developers.google.c
        // this.rows - cell row information for the tab that was fetched
       });
 
-      sheet.addEventListener('core-error', function(e) {
+      sheet.addEventListener('error', function(e) {
        // e.detail.response
       });
     </script>
@@ -45,14 +45,13 @@ See [developers.google.com/google-apps/spreadsheets](https://developers.google.c
       client-id="...">
     </google-sheets>
     <google-map>
-      <template repeat="{{row in rows}}">
-        <google-map-marker latitude="{{row.gsx$lat.$t}}" longitude="{{row.gsx$lng.$t}}">
+      <template is="x-autobind">
+        <google-map-marker latitude="{{gsx$lat.$t}}" longitude="{{gsx$lng.$t}}">
       </template>
     </google-map>
 
 @element google-sheets
 @blurb Element for interacting with Google Sheets.
-@status alpha
 @homepage https://googlewebcomponents.github.io/google-sheets
 -->
 
@@ -69,12 +68,12 @@ Fired when the spreadsheet's cell information is available.
   <template>
     <!-- TODO(ericbidelman): remove clientid when
          https://github.com/GoogleWebComponents/google-signin/issues/7 is fixed. -->
-    <template if="{{!published}}">
+    <!-- <template if="{{!published}}">
       <google-signin client-id="[[clientId]]"
                      scopes="https://spreadsheets.google.com/feeds"
                      on-google-signin-success="onSignInSuccess"
                      on-google-signin-failure="onSignInFail"></google-signin>
-    </template>
+    </template> -->
 
     <core-ajax id="publicajax" params='{"alt": "json"}' handle-as="json"
                on-response="onCellRows"></core-ajax>
