@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../core-ajax/core-ajax.html">
-<link rel="import" href="../google-signin/google-signin.html">
+<!-- <link rel="import" href="../google-signin/google-signin.html"> -->
 
 <!--
 Element for interacting with Google Sheets.
@@ -10,11 +10,11 @@ A spreadsheet's key can be found in the URL when viewing it in google docs (e.g.
 
 Optionally, pass the `tabid` attribute to specify a particular worksheet tab in the spreadsheet. For example, the first tab would be `tabid="1"`. If `tab` is updated at a later time, the underlying data is also updated. **API calls are cached** as to not make extraneous calls.
 
-See [developers.google.com/google-apps/spreadsheets](http://developers.google.com/google-apps/spreadsheets) for full Spreadsheets API documentation.
+See [developers.google.com/google-apps/spreadsheets](https://developers.google.com/google-apps/spreadsheets) for full Spreadsheets API documentation.
 
 #### Example
 
-    <google-sheets key="..." tabid="1" clientId="..."></google-sheets>
+    <google-sheets key="..." tabid="1" client-id="..."></google-sheets>
 
     <script>
       var sheet = document.querySelector('google-sheets');
@@ -36,13 +36,13 @@ See [developers.google.com/google-apps/spreadsheets](http://developers.google.co
 
 <b>Example</b> - leaving off the `key` returns as list of the user's spreadsheets.
 
-    <google-sheets clientId="..."></google-sheets>
+    <google-sheets client-id="..."></google-sheets>
 
 <b>Example</b> - show a list of Map markers, using data-binding features inside Polymer:
 
     <google-sheets
       key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tabid="1" rows="{{rows}}"
-      clientId="...">
+      client-id="...">
     </google-sheets>
     <google-map>
       <template repeat="{{row in rows}}">
@@ -53,7 +53,7 @@ See [developers.google.com/google-apps/spreadsheets](http://developers.google.co
 @element google-sheets
 @blurb Element for interacting with Google Sheets.
 @status alpha
-@homepage http://googlewebcomponents.github.io/google-sheets
+@homepage https://googlewebcomponents.github.io/google-sheets
 -->
 
 <!--
@@ -65,26 +65,29 @@ Fired when the spreadsheet's cell information is available.
 @param {string} detail.type The type of data that was fetched. One of 'spreadsheets', 'tab', 'rows' to correspond to the feed type.
 -->
 
-<polymer-element name="google-sheets" attributes="clientId key tabid published rows">
-<template>
-  <!-- TODO(ericbidelman): remove clientId when
-       https://github.com/GoogleWebComponents/google-signin/issues/7 is fixed. -->
-  <template if="{{!published}}">
-    <google-signin clientId="{{clientId}}" scopes="https://spreadsheets.google.com/feeds"
-                   on-google-signin-success="{{onSignInSuccess}}"
-                   on-google-signin-failure="{{onSignInFail}}"></google-signin>
+<dom-module id="google-sheets">
+  <template>
+    <!-- TODO(ericbidelman): remove clientid when
+         https://github.com/GoogleWebComponents/google-signin/issues/7 is fixed. -->
+    <template if="{{!published}}">
+      <google-signin client-id="[[clientId]]"
+                     scopes="https://spreadsheets.google.com/feeds"
+                     on-google-signin-success="onSignInSuccess"
+                     on-google-signin-failure="onSignInFail"></google-signin>
+    </template>
+
+    <core-ajax id="publicajax" params='{"alt": "json"}' handle-as="json"
+               on-response="onCellRows"></core-ajax>
+    <core-ajax id="listsheetsajax" params='{"alt": "json"}' handle-as="json"
+               on-response="onSpreadsheetList"></core-ajax>
+    <core-ajax id="worksheetajax" params='{"alt": "json"}' handle-as="json"
+               on-response="onWorksheet"></core-ajax>
+    <core-ajax id="cellrowsajax" params='{"alt": "json"}' handle-as="json"
+               on-response="onCellRows"></core-ajax>
+
   </template>
+</dom-module>
 
-  <core-ajax id="publicajax" auto params='{"alt": "json"}' handleAs="json"
-             on-core-response="{{onCellRows}}"></core-ajax>
-  <core-ajax id="listsheetsajax" auto params='{"alt": "json"}' handleAs="json"
-             on-core-response="{{onSpreadsheetList}}"></core-ajax>
-  <core-ajax id="worksheetajax" auto params='{"alt": "json"}' handleAs="json"
-             on-core-response="{{onWorksheet}}"></core-ajax>
-  <core-ajax id="cellrowsajax" auto params='{"alt": "json"}' handleAs="json"
-             on-core-response="{{onCellRows}}"></core-ajax>
-
-</template>
 <script>
 (function() {
   var SCOPE_ = 'https://spreadsheets.google.com/feeds';
@@ -117,76 +120,71 @@ Fired when the spreadsheet's cell information is available.
     return parseInt((gid ^ 31578)).toString(36);
   }
 
-  Polymer({
+  window.GoogleSheets = Polymer({
 
-    /**
-     * A Google Developers clientId. Obtain from [console.developers.google.com](https://console.developers.google.com). Required for accessing a private spreadsheet. Optional if accessing a public spreadsheet.
-     *
-     * @attribute clientId
-     * @type string
-     */
-    clientId: '',
+    is: 'google-sheets',
 
-    /**
-     * The key of the spreadsheet. This can be found in the URL when viewing
-     * the document is Google Docs (e.g. `docs.google.com/spreadsheet/ccc?key=<KEY>`).
-     *
-     * Leaving off this attribute still returns a list of the users spreadsheets in the `spreadsheets` property.
-     *
-     * @attribute key
-     * @type string
-     * @default ''
-     */
-    key: '',
+    properties: {
+      /**
+       * A Google Developers client ID. Obtain from [console.developers.google.com](https://console.developers.google.com). Required for accessing a private spreadsheet. Optional if accessing a public spreadsheet.
+       *
+       * @attribute clientId
+       * @type String
+       */
+      clientId: {
+        type: String,
+        value: ''
+      },
 
-    /**
-     * Tab within a spreadsheet. For example, the first tab in a spreadsheet
-     * would be `tab="1"`.
-     *
-     * @attribute tabid
-     * @type number
-     * @default 1
-     */
-    tabid: 1,
+      /**
+       * The key of the spreadsheet. This can be found in the URL when viewing
+       * the document is Google Docs (e.g. `docs.google.com/spreadsheet/ccc?key=<KEY>`).
+       *
+       * Leaving off this attribute still returns a list of the users spreadsheets in the `spreadsheets` property.
+       *
+       * @attribute key
+       * @type String
+       * @default ''
+       */
+      key: {
+        type: String,
+        value: '',
+        observer: 'keyChanged'
+      },
 
-    /**
-     * A hint that the spreadsheet is published publicly in Google Docs. Used as a performance optimization.
-     * Make sure the sheet is also publicly viewable by anyone in the Share settings.
-     *
-     * @attribute published
-     * @type boolean
-     * @default false
-     */
-    published: false,
+      /**
+       * Tab within a spreadsheet. For example, the first tab in a spreadsheet
+       * would be `tabid="1"`.
+       *
+       * @attribute tabid
+       * @type Number
+       * @default 1
+       */
+      tabid: {
+        type: Number,
+        value: 1,
+        observer: 'tabidChanged'
+      },
 
-    worksheetId_: null,
+      /**
+       * A hint that the spreadsheet is published publicly in Google Docs. Used as a performance optimization.
+       * Make sure the sheet is also publicly viewable by anyone in the Share settings.
+       *
+       * @attribute published
+       * @type boolean
+       * @default false
+       */
+      published: {
+        type: Boolean,
+        value: false
+      },
 
-    /**
-     * List of the user's spreadsheets. Shared across instances.
-     *
-     * @property spreadsheets
-     * @type array
-     */
-     spreadsheets: [],
+      _worksheetId: {
+        type: String,
+        value: null,
+        readOnly: true
+      },
 
-    /**
-     * The URL to open this spreadsheet in Google Sheets.
-     *
-     * @property openInGoogleDocsURL
-     * @readonly
-     * @type string
-     */
-    get openInGoogleDocsURL() {
-      var url = 'https://docs.google.com/spreadsheet/';
-      if (this.key) {
-        url += 'ccc?key=' + this.key;
-      }
-      //url += '#gid=' + this.gid;
-
-      return url;
-    },
-
-    created: function() {
       /**
        * The fetched sheet corresponding to the `key` attribute.
        *
@@ -194,7 +192,13 @@ Fired when the spreadsheet's cell information is available.
        * @type Object
        * @default {}
        */
-      this.sheet = {};
+      sheet: {
+        type: Object,
+        value: function() { return {}; },
+        readOnly: true,
+        notify: true,
+        observer: 'sheetChanged'
+      },
 
       /**
        * Meta data about the particular tab that was retrieved for the spreadsheet.
@@ -203,31 +207,127 @@ Fired when the spreadsheet's cell information is available.
        * @type Object
        * @default {}
        */
-      this.tab = {};
+      tab: {
+        type: Object,
+        value: function() { return {}; },
+        readOnly: true,
+        notify: true,
+        observer: 'tabChanged'
+      },
 
       /**
        * If a spreadsheet `key` is specified, returns a list of cell row data.
        *
        * @attribute rows
-       * @type array
+       * @type Array
        * @default []
        */
-      this.rows = [];
+      rows: {
+        type: Array,
+        value: function() { return []; },
+        readOnly: true,
+        notify: true,
+        reflectToAttribute: true
+      },
 
-      this.spreadsheets = this.spreadsheets || [];
+      /**
+       * List of the user's spreadsheets. Shared across instances.
+       *
+       * @property spreadsheets
+       * @type Array
+       */
+      spreadsheets: {
+        type: Array,
+        readOnly: true,
+        value: function() { return []; }
+      },
+
+      /**
+       * The URL to open this spreadsheet in Google Sheets.
+       *
+       * @property openInGoogleDocsURL
+       * @readonly
+       * @type String
+       */
+      openInGoogleDocsURL: {
+        type: String,
+        readOnly: true,
+        value: function() {
+          var url = 'https://docs.google.com/spreadsheet/';
+          if (this.key) {
+            url += 'ccc?key=' + this.key;
+          }
+          return url;
+        }
+      }
     },
 
-    keyChanged: function() {
+    observers: {
+      'key published tabid clientId': 'configUpdate'
+    },
+
+    configUpdate: function(key, published, tabid, clientId) {
+      this.tabidChanged();
+    },
+
+    keyChanged: function(newValue, oldValue) {
       // TODO(ericbidelman): need to better handle updates to the key attribute.
       // Below doesn't account for private feeds.
       if (this.published) {
         var url = SCOPE_ + '/list/' + this.key + '/' +
                   this.tabid + '/public/values';
         this.$.publicajax.url = url;
+        this.$.publicajax.generateRequest();
       }
     },
 
-    onSignInSuccess: function(e, detail, sender) {
+    tabidChanged: function(newValue, oldValue) {
+      if (this.worksheetId_) {
+        this.getCellRows();
+      } else if (this.published) {
+        this.keyChanged();
+      }
+    },
+
+    sheetChanged: function(newValue, oldValue) {
+      if (!this.sheet.title) {
+        return;
+      }
+
+      // Make metadata easily accessible on sheet object.
+      var authors = this.sheet.author && this.sheet.author.map(function(a) {
+        return {email: a.email.$t, name: a.name.$t};
+      });
+
+      this.setPathValue('sheet.title', this.sheet.title.$t);
+      this.setPathValue('sheet.updated', new Date(this.sheet.updated.$t));
+      this.setPathValue('sheet.authors', authors);
+
+      //this.worksheetId_ = this.sheet.id.$t.split('/').slice(-1)[0];
+      this._setWorksheetId_(this.sheet.id.$t.split('/').slice(-1)[0]);
+      this.getWorksheet();
+    },
+
+    tabChanged: function(newValue, oldValue) {
+      if (!this.tab.title) {
+        return;
+      }
+
+      var authors = this.tab.authors = this.tab.author && this.tab.author.map(function(a) {
+        return {email: a.email.$t, name: a.name.$t};
+      });
+
+      this.setPathValue('tab.title', this.tab.title.$t);
+      this.setPathValue('tab.updated', new Date(this.tab.updated.$t));
+      this.setPathValue('tab.authors', authors);
+
+      this.fire('google-sheet-data', {
+        type: 'tab',
+        data: this.tab
+      });
+    },
+
+    onSignInSuccess: function(e, detail) {
       var oauthToken = gapi.auth.getToken();
 
       var headers = {
@@ -243,7 +343,7 @@ Fired when the spreadsheet's cell information is available.
       this.listSpreadsheets();
     },
 
-    onSignInFail: function(e, detail, sender) {
+    onSignInFail: function(e, detail) {
       // TODO(ericbidelman): handle this in some way.
       console.log(e, e.type);
     },
@@ -251,12 +351,15 @@ Fired when the spreadsheet's cell information is available.
     listSpreadsheets: function() {
       var url = SCOPE_ + '/spreadsheets/private/full';
       this.$.listsheetsajax.url = url;
+      this.$.listsheetsajax.generateRequest();
     },
 
-    onSpreadsheetList: function(e, detail, sender) {
-      var feed = sender.response.feed;
+    onSpreadsheetList: function(e) {
+      e.stopPropagation();
 
-      this.spreadsheets = sender.response.feed.entry;
+      var feed = e.target.lastResponse.feed;
+
+      this.spreadsheets = feed.entry;
 
       this.fire('google-sheet-data', {
         type: 'spreadsheets',
@@ -283,16 +386,20 @@ Fired when the spreadsheet's cell information is available.
       var url = SCOPE_ + '/worksheets/' + this.worksheetId_ +
                 '/private/full/' + this.tabid;
       this.$.worksheetajax.url = url;
+      this.$.worksheetajax.generateRequest();
     },
 
-    onWorksheet: function(e, detail, sender) {
-      this.tab = sender.response.entry;
+    onWorksheet: function(e) {
+      e.stopPropagation();
+
+      // this.tab = e.target.lastResponse.entry;
+      this._setTab(e.target.lastResponse.entry);
       this.getCellRows();
     },
 
     getCellRows: function() {
       // Use cached data if available.
-      var key = generateCacheKey_.bind(this)();
+      var key = generateCacheKey_.call(this);
       if (key in rowDataCache_) {
         this.onCellRows(null, null, rowDataCache_[key]);
 
@@ -303,62 +410,35 @@ Fired when the spreadsheet's cell information is available.
                 this.worksheetId_ + '/' + this.tabid +
                 '/private/full';
       this.$.cellrowsajax.url = url;
+      this.$.cellrowsajax.generateRequest();
     },
 
-    onCellRows: function(e, detail, sender) {
-      var feed = sender.response.feed;
+    onCellRows: function(e) {
+      e.stopPropagation();
+
+      var feed = e.target.lastResponse.feed;
 
       // Cache data if key doesn't exist.
-      var key = generateCacheKey_.bind(this)();
+      var key = generateCacheKey_.call(this);
       if (!(key in rowDataCache_)) {
         rowDataCache_[key] = {response: {feed: feed}};
       }
 
-      this.rows = feed.entry;
-      this.rows.authors = feed.author && feed.author.map(function(a) {
+      // this.rows = feed.entry;
+      this._setRows(feed.entry);
+      var authors = feed.author && feed.author.map(function(a) {
         return {email: a.email.$t, name: a.name.$t};
       });
+      this.setPathValue('rows.authors', authors);
 
       if (this.published) {
-        this.tab = feed;
+        // this.tab = feed;
+        this._setTab(feed);
       }
 
       this.fire('google-sheet-data', {
         type: 'rows',
         data: this.rows
-      });
-    },
-
-    tabidChanged: function() {
-      if (this.worksheetId_) {
-        this.getCellRows();
-      } else if (this.published) {
-        this.keyChanged();
-      }
-    },
-
-    sheetChanged: function() {
-      // Make metadata easily acessible on on sheet object.
-      this.sheet.title = this.sheet.title.$t;
-      this.sheet.updated = new Date(this.sheet.updated.$t);
-      this.sheet.authors = this.sheet.author && this.sheet.author.map(function(a) {
-        return {email: a.email.$t, name: a.name.$t};
-      });
-
-      this.worksheetId_ = this.sheet.id.$t.split('/').slice(-1)[0];
-      this.getWorksheet();
-    },
-
-    tabChanged: function() {
-      this.tab.title = this.tab.title.$t;
-      this.tab.updated = new Date(this.tab.updated.$t);
-      this.tab.authors = this.tab.author && this.tab.author.map(function(a) {
-        return {email: a.email.$t, name: a.name.$t};
-      });
-
-      this.fire('google-sheet-data', {
-        type: 'tab',
-        data: this.tab
       });
     }
 
@@ -366,4 +446,3 @@ Fired when the spreadsheet's cell information is available.
 
 })();
 </script>
-</polymer-element>

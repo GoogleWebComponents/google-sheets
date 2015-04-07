@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
   <title>google-sheets Demo</title>
   <script src="../webcomponentsjs/webcomponents.min.js"></script>
+  <link rel="import" href="../layout/layout.html">
   <link rel="import" href="google-sheets.html">
-  <link rel="import" href="../google-map/google-map.html">
+  <!-- <link rel="import" href="../google-map/google-map.html"> -->
   <style>
     * {
       box-sizing: border-box;
@@ -47,29 +48,31 @@
     }
   </style>
 </head>
-<body unresolved>
+<body>
 
 <p>A <code>&lt;google-sheets></code> element returns data from a Google Spreadsheet:</p>
 
-<!-- Example: published spreadsheet -->
-<google-sheets id="sheet" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tabid="1" published></google-sheets>
-
-<main layout horizontal>
+<main class="layout horizontal">
 
 <section>
 
-  <template id="rows" bind>
+  <template is="x-autobind">
+
+    <!-- Example: published spreadsheet -->
+    <google-sheets id="sheet" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tabid="1"
+                   published rows="{{rows}}" tab="{{tab}}"></google-sheets>
+
     <heading>
       <h3>Spreadsheet rows:
         <a href="{{openInGoogleDocsURL}}" target="_blank" title="Open in Google Docs &rarr;">
-          "{{tab.title}}" tab
+          "<span>{{tab.title}}</span>" tab
         </a>
       </h3>
-      <h5>updated: {{tab.updated}}, by: <template repeat="{{rows.authors}}">{{name}} </template></h5>
+      <h5>updated: <span>{{tab.updated}}</span>, by: <template is="x-repeat" items="{{rows.authors}}">{{item.name}}</template></h5>
     </heading>
     <ul>
-      <template repeat="{{rows}}">
-        <li>Name: {{gsx$name.$t}} ( lat: {{gsx$lat.$t}}, lng: {{gsx$lng.$t}} )</li>
+      <template is="x-repeat" items="[[rows]]">
+        <li>Name: <span>{{item.gsx$name.$t}}</span> ( lat: <span>{{item.gsx$lat.$t}}</span>, lng: <span>{{item.gsx$lng.$t}}</span> )</li>
       </template>
     </ul>
   </template>
@@ -79,16 +82,16 @@
 <section style="padding: 0;">
 
   <!-- Example of using Polymer's <template is="auto-binding"> -->
-  <template is="auto-binding">
+  <template is="x-autobind" id="t2">
     <google-sheets id="sheet2" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tabid="1" rows="{{rows}}" published></google-sheets>
     <google-map disableDefaultUI fittomarkers>
-      <template repeat="{{row in rows}}">
-        <google-map-marker latitude="{{row.gsx$lat.$t}}" longitude="{{row.gsx$lng.$t}}"></google-map-marker>
+      <template is="x-repeat" items="[[rows]]">
+        <google-map-marker latitude="{{gsx$lat.$t}}" longitude="{{gsx$lng.$t}}"></google-map-marker>
       </template>
     </google-map>
 
-    <button on-click="{{useTab}}" data-tabid="1">View tab 1 data</button>
-    <button on-click="{{useTab}}" data-tabid="2">View tab 2 data</button>
+    <button on-click="useTab" data-tabid="1">View tab 1 data</button>
+    <button on-click="useTab" data-tabid="2">View tab 2 data</button>
   </template>
 
 </section>
@@ -97,29 +100,12 @@
 
 <script>
 var sheet = document.querySelector('#sheet');
-var template = document.querySelector('template[is="auto-binding"]');
+var template = document.querySelector('#t2');
 
 template.useTab = function(e, detail, sender) {
   sheet.tabid = Number(sender.dataset.tabid);
   document.querySelector('#sheet2').tabid = Number(sender.dataset.tabid);
 };
-
-sheet.addEventListener('google-sheet-data', function(e) {
-  switch (e.detail.type) {
-    case 'spreadsheets':
-      // Noop. Just shown as an example.
-      break;
-    case 'rows':
-      document.querySelector('#rows').model = this;
-      break;
-    default:
-      break;
-  }
-});
-
-sheet.addEventListener('core-error', function(e) {
-  console.error(e.detail.response);
-});
 </script>
 </body>
 </html>
