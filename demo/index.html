@@ -4,10 +4,10 @@
 <head>
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
   <title>google-sheets Demo</title>
-  <script src="../webcomponentsjs/webcomponents.min.js"></script>
-  <link rel="import" href="../layout/layout.html">
-  <link rel="import" href="google-sheets.html">
-  <!-- <link rel="import" href="../google-map/google-map.html"> -->
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../iron-flex-layout/classes/iron-flex-layout.html">
+  <link rel="import" href="../google-sheets.html">
+  <link rel="import" href="../../google-map/google-map.html">
   <style>
     * {
       box-sizing: border-box;
@@ -56,7 +56,7 @@
 
 <section>
 
-  <template is="x-autobind">
+  <template is="dom-bind">
 
     <!-- Example: published spreadsheet -->
     <google-sheets id="sheet" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tabid="1"
@@ -71,7 +71,7 @@
       <h5>updated: <span>{{tab.updated}}</span>, by: <template is="x-repeat" items="{{rows.authors}}">{{item.name}}</template></h5>
     </heading>
     <ul>
-      <template is="x-repeat" items="[[rows]]">
+      <template is="dom-repeat" items="[[rows]]">
         <li>Name: <span>{{item.gsx$name.$t}}</span> ( lat: <span>{{item.gsx$lat.$t}}</span>, lng: <span>{{item.gsx$lng.$t}}</span> )</li>
       </template>
     </ul>
@@ -82,11 +82,11 @@
 <section style="padding: 0;">
 
   <!-- Example of using Polymer's <template is="auto-binding"> -->
-  <template is="x-autobind" id="t2">
+  <template is="dom-bind" id="t2">
     <google-sheets id="sheet2" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tabid="1" rows="{{rows}}" published></google-sheets>
-    <google-map disableDefaultUI fittomarkers>
-      <template is="x-repeat" items="[[rows]]">
-        <google-map-marker latitude="{{gsx$lat.$t}}" longitude="{{gsx$lng.$t}}"></google-map-marker>
+    <google-map disable-default-ui fittomarkers>
+      <template is="dom-repeat" items="[[rows]]">
+        <google-map-marker latitude="{{item.gsx$lat.$t}}" longitude="{{item.gsx$lng.$t}}"></google-map-marker>
       </template>
     </google-map>
 
@@ -103,8 +103,8 @@ var sheet = document.querySelector('#sheet');
 var template = document.querySelector('#t2');
 
 template.useTab = function(e, detail, sender) {
-  sheet.tabid = Number(sender.dataset.tabid);
-  document.querySelector('#sheet2').tabid = Number(sender.dataset.tabid);
+  sheet.tabid = Number(e.currentTarget.dataset.tabid);
+  document.querySelector('#sheet2').tabid = Number(e.currentTarget.dataset.tabid);
 };
 </script>
 </body>
