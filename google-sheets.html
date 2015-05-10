@@ -120,9 +120,6 @@ Fired when the spreadsheet's cell information is available.
     properties: {
       /**
        * A Google Developers client ID. Obtain from [console.developers.google.com](https://console.developers.google.com). Required for accessing a private spreadsheet. Optional if accessing a public spreadsheet.
-       *
-       * @attribute clientId
-       * @type String
        */
       clientId: {
         type: String,
@@ -134,10 +131,6 @@ Fired when the spreadsheet's cell information is available.
        * the document is Google Docs (e.g. `docs.google.com/spreadsheet/ccc?key=<KEY>`).
        *
        * Leaving off this attribute still returns a list of the users spreadsheets in the `spreadsheets` property.
-       *
-       * @attribute key
-       * @type String
-       * @default ''
        */
       key: {
         type: String,
@@ -148,10 +141,6 @@ Fired when the spreadsheet's cell information is available.
       /**
        * Tab within a spreadsheet. For example, the first tab in a spreadsheet
        * would be `tabid="1"`.
-       *
-       * @attribute tabid
-       * @type Number
-       * @default 1
        */
       tabid: {
         type: Number,
@@ -180,10 +169,6 @@ Fired when the spreadsheet's cell information is available.
 
       /**
        * The fetched sheet corresponding to the `key` attribute.
-       *
-       * @property sheet
-       * @type Object
-       * @default {}
        */
       sheet: {
         type: Object,
@@ -195,10 +180,6 @@ Fired when the spreadsheet's cell information is available.
 
       /**
        * Meta data about the particular tab that was retrieved for the spreadsheet.
-       *
-       * @property tab
-       * @type Object
-       * @default {}
        */
       tab: {
         type: Object,
@@ -210,24 +191,16 @@ Fired when the spreadsheet's cell information is available.
 
       /**
        * If a spreadsheet `key` is specified, returns a list of cell row data.
-       *
-       * @attribute rows
-       * @type Array
-       * @default []
        */
       rows: {
         type: Array,
         value: function() { return []; },
         readOnly: true,
-        notify: true,
-        // reflectToAttribute: true
+        notify: true
       },
 
       /**
        * List of the user's spreadsheets. Shared across instances.
-       *
-       * @property spreadsheets
-       * @type Array
        */
       spreadsheets: {
         type: Array,
@@ -237,27 +210,25 @@ Fired when the spreadsheet's cell information is available.
 
       /**
        * The URL to open this spreadsheet in Google Sheets.
-       *
-       * @property openInGoogleDocsURL
-       * @readonly
-       * @type String
        */
-      openInGoogleDocsURL: {
+      openInGoogleDocsUrl: {
         type: String,
-        readOnly: true,
-        value: function() {
-          var url = 'https://docs.google.com/spreadsheet/';
-          if (this.key) {
-            url += 'ccc?key=' + this.key;
-          }
-          return url;
-        }
+        computed: '_computeGoogleDocsUrl(key)',
+        notify: true
       }
     },
 
     observers: [
       '_configUpdate(key published tabid clientId)'
     ],
+
+    _computeGoogleDocsUrl: function(key) {
+      var url = 'https://docs.google.com/spreadsheet/';
+      if (key) {
+        url += 'ccc?key=' + key;
+      }
+      return url;
+    },
 
     _configUpdate: function(key, published, tabid, clientId) {
       this._tabidChanged();
