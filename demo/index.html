@@ -59,7 +59,7 @@
   <template is="dom-bind">
 
     <!-- Example: published spreadsheet -->
-    <google-sheets id="sheet" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tabid="1"
+    <google-sheets id="sheet" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tab-id="1"
                    published rows="{{rows}}" tab="{{tab}}" open-in-google-docs-url="{{openInGoogleDocsUrl}}"></google-sheets>
 
     <heading>
@@ -83,7 +83,7 @@
 
   <!-- Example of using Polymer's <template is="auto-binding"> -->
   <template is="dom-bind" id="t2">
-    <google-sheets id="sheet2" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tabid="1" rows="{{rows}}" published></google-sheets>
+    <google-sheets id="sheet2" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tab-id="1" rows="{{rows}}" published></google-sheets>
     <google-map disable-default-ui fit-to-markers>
       <template is="dom-repeat" items="[[rows]]">
         <google-map-marker latitude="{{item.gsx$lat.$t}}" longitude="{{item.gsx$lng.$t}}"></google-map-marker>
@@ -104,7 +104,7 @@ var template = document.querySelector('#t2');
 
 template.useTab = function(e, detail, sender) {
   sheet.tabid = Number(e.currentTarget.dataset.tabid);
-  document.querySelector('#sheet2').tabid = Number(e.currentTarget.dataset.tabid);
+  document.querySelector('#sheet2').tabId = Number(e.currentTarget.dataset.tabid);
 };
 </script>
 </body>

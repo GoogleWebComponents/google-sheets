@@ -8,13 +8,13 @@ Element for interacting with Google Sheets.
 `<google-sheets>` pulls cell data from the Google Sheet specified by `key`.
 A spreadsheet's key can be found in the URL when viewing it in google docs (e.g. `docs.google.com/spreadsheet/ccc?key=<KEY>#gid=12345`).
 
-Optionally, pass the `tabid` attribute to specify a particular worksheet tab in the spreadsheet. For example, the first tab would be `tabid="1"`. If `tab` is updated at a later time, the underlying data is also updated. **API calls are cached** as to not make extraneous calls.
+Optionally, pass the `tab-id` attribute to specify a particular worksheet tab in the spreadsheet. For example, the first tab would be `tab-id="1"`. If `tab` is updated at a later time, the underlying data is also updated. **API calls are cached** as to not make extraneous calls.
 
 See [developers.google.com/google-apps/spreadsheets](https://developers.google.com/google-apps/spreadsheets) for full Spreadsheets API documentation.
 
 #### Example
 
-    <google-sheets key="..." tabid="1" client-id="..."></google-sheets>
+    <google-sheets key="..." tab-id="1" client-id="..."></google-sheets>
 
     <script>
       var sheet = document.querySelector('google-sheets');
@@ -41,7 +41,7 @@ See [developers.google.com/google-apps/spreadsheets](https://developers.google.c
 <b>Example</b> - show a list of Map markers, using data-binding features inside Polymer:
 
     <google-sheets
-      key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tabid="1" rows="{{rows}}"
+      key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tab-id="1" rows="{{rows}}"
       client-id="...">
     </google-sheets>
     <google-map>
@@ -82,7 +82,7 @@ See [developers.google.com/google-apps/spreadsheets](https://developers.google.c
   var rowDataCache_ = {};
 
   function generateCacheKey_() {
-    return this.worksheetId_ + '_'+ this.tabid;
+    return this.worksheetId_ + '_'+ this.tabId;
   }
 
   function getLink_(rel, links) {
@@ -140,12 +140,12 @@ Fired when the spreadsheet's cell information is available.
 
       /**
        * Tab within a spreadsheet. For example, the first tab in a spreadsheet
-       * would be `tabid="1"`.
+       * would be `tab-id="1"`.
        */
-      tabid: {
+      tabId: {
         type: Number,
         value: 1,
-        observer: '_tabidChanged'
+        observer: '_tabIdChanged'
       },
 
       /**
@@ -219,7 +219,7 @@ Fired when the spreadsheet's cell information is available.
     },
 
     observers: [
-      '_configUpdate(key published tabid clientId)'
+      '_configUpdate(key published tabId clientId)'
     ],
 
     _computeGoogleDocsUrl: function(key) {
@@ -230,8 +230,8 @@ Fired when the spreadsheet's cell information is available.
       return url;
     },
 
-    _configUpdate: function(key, published, tabid, clientId) {
-      this._tabidChanged();
+    _configUpdate: function(key, published, tabId, clientId) {
+      this._tabIdChanged();
     },
 
     _keyChanged: function(newValue, oldValue) {
@@ -239,13 +239,13 @@ Fired when the spreadsheet's cell information is available.
       // Below doesn't account for private feeds.
       if (this.published) {
         var url = SCOPE_ + '/list/' + this.key + '/' +
-                  this.tabid + '/public/values';
+                  this.tabId + '/public/values';
         this.$.publicajax.url = url;
         this.$.publicajax.generateRequest();
       }
     },
 
-    _tabidChanged: function(newValue, oldValue) {
+    _tabIdChanged: function(newValue, oldValue) {
       if (this.worksheetId_) {
         this._getCellRows();
       } else if (this.published) {
@@ -348,7 +348,7 @@ Fired when the spreadsheet's cell information is available.
       }
 
       var url = SCOPE_ + '/worksheets/' + this.worksheetId_ +
-                '/private/full/' + this.tabid;
+                '/private/full/' + this.tabId;
       this.$.worksheetajax.url = url;
       this.$.worksheetajax.generateRequest();
     },
@@ -371,7 +371,7 @@ Fired when the spreadsheet's cell information is available.
       }
 
       var url = SCOPE_ + '/list/' +
-                this.worksheetId_ + '/' + this.tabid +
+                this.worksheetId_ + '/' + this.tabId +
                 '/private/full';
       this.$.cellrowsajax.url = url;
       this.$.cellrowsajax.generateRequest();
