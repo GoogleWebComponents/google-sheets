@@ -54,36 +54,32 @@
 
 <main class="layout horizontal">
 
-<section>
+<template id="container" is="dom-bind">
 
-  <template is="dom-bind">
+  <section>
 
-    <!-- Example: published spreadsheet -->
-    <google-sheets id="sheet" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tab-id="1"
-                   published rows="{{rows}}" tab="{{tab}}" open-in-google-docs-url="{{openInGoogleDocsUrl}}"></google-sheets>
+      <!-- Example: published spreadsheet -->
+      <google-sheets id="sheet" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tab-id="1"
+                     published rows="{{rows}}" tab="{{tab}}" open-in-google-docs-url="{{openInGoogleDocsUrl}}"></google-sheets>
 
-    <heading>
-      <h3>Spreadsheet rows:
-        <a href="{{openInGoogleDocsUrl}}" target="_blank" title="Open in Google Docs &rarr;">
-          "<span>{{tab.title}}</span>" tab
-        </a>
-      </h3>
-      <h5>updated: <span>{{tab.updated}}</span>, by: <template is="dom-repeat" items="{{rows.authors}}">{{item.name}}</template></h5>
-    </heading>
-    <ul>
-      <template is="dom-repeat" items="[[rows]]">
-        <li>Name: <span>{{item.gsx$name.$t}}</span> ( lat: <span>{{item.gsx$lat.$t}}</span>, lng: <span>{{item.gsx$lng.$t}}</span> )</li>
-      </template>
-    </ul>
-  </template>
+      <heading>
+        <h3>Spreadsheet rows:
+          <a href="{{openInGoogleDocsUrl}}" target="_blank" title="Open in Google Docs &rarr;">
+            "<span>{{tab.title}}</span>" tab
+          </a>
+        </h3>
+        <h5>updated: <span>{{tab.updated}}</span>, by: <template is="dom-repeat" items="{{rows.authors}}">{{item.name}}</template></h5>
+      </heading>
+      <ul>
+        <template is="dom-repeat" items="[[rows]]">
+          <li>Name: <span>{{item.gsx$name.$t}}</span> ( lat: <span>{{item.gsx$lat.$t}}</span>, lng: <span>{{item.gsx$lng.$t}}</span> )</li>
+        </template>
+      </ul>
 
-</section>
+  </section>
 
-<section style="padding: 0;">
+  <section style="padding: 0;">
 
-  <!-- Example of using Polymer's <template is="auto-binding"> -->
-  <template is="dom-bind" id="t2">
-    <google-sheets id="sheet2" key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tab-id="1" rows="{{rows}}" published></google-sheets>
     <google-map disable-default-ui fit-to-markers>
       <template is="dom-repeat" items="[[rows]]">
         <google-map-marker latitude="{{item.gsx$lat.$t}}" longitude="{{item.gsx$lng.$t}}"></google-map-marker>
@@ -92,19 +88,17 @@
 
     <button on-click="useTab" data-tabid="1">View tab 1 data</button>
     <button on-click="useTab" data-tabid="2">View tab 2 data</button>
-  </template>
 
-</section>
+  </section>
 
+</template>
 </main>
 
 <script>
-var sheet = document.querySelector('#sheet');
-var template = document.querySelector('#t2');
+var template = document.querySelector('#container');
 
 template.useTab = function(e, detail, sender) {
-  sheet.tabid = Number(e.currentTarget.dataset.tabid);
-  document.querySelector('#sheet2').tabId = Number(e.currentTarget.dataset.tabid);
+  document.querySelector('#sheet').tabId = Number(e.currentTarget.dataset.tabid);
 };
 </script>
 </body>
