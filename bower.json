@@ -21,7 +21,7 @@
     "google"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#0.9.0",
+    "polymer": "Polymer/polymer#^0.9.0",
     "google-apis": "GoogleWebComponents/google-apis#^1.0.0",
     "google-signin": "GoogleWebComponents/google-signin#^1.0.0",
     "iron-ajax": "PolymerElements/iron-ajax#^0.9.6"

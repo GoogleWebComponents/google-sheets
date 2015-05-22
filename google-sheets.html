@@ -15,7 +15,6 @@ See [developers.google.com/google-apps/spreadsheets](https://developers.google.c
 #### Example
 
     <google-sheets key="..." tab-id="1" client-id="..."></google-sheets>
-
     <script>
       var sheet = document.querySelector('google-sheets');
 
@@ -49,6 +48,17 @@ See [developers.google.com/google-apps/spreadsheets](https://developers.google.c
         <google-map-marker latitude="{{gsx$lat.$t}}" longitude="{{gsx$lng.$t}}">
       </template>
     </google-map>
+
+<b>Example</b> - access to a private spreadsheet requires `<google-signin>`:
+
+    <google-sheets key="..."></google-sheets>
+    <google-signin clientId="..." scopes="https://spreadsheets.google.com/feeds"></google-signin>
+
+@element google-sheets
+@blurb Element for interacting with Google Sheets.
+@status alpha
+@homepage https://googlewebcomponents.github.io/google-sheets
+>>>>>>> 8cbfb155dd454c0f0cf548aed0fca05beaae6032
 -->
 
 
@@ -69,7 +79,6 @@ See [developers.google.com/google-apps/spreadsheets](https://developers.google.c
                on-response="_onWorksheet"></iron-ajax>
     <iron-ajax id="cellrowsajax" params='{"alt": "json"}' handle-as="json"
                on-response="_onCellRows"></iron-ajax>
-
   </template>
 </dom-module>
 
@@ -106,6 +115,62 @@ See [developers.google.com/google-apps/spreadsheets](https://developers.google.c
   }
 
   window.GoogleSheets = Polymer({
+    /**
+     * The key of the spreadsheet. This can be found in the URL when viewing
+     * the document is Google Docs (e.g. `docs.google.com/spreadsheet/ccc?key=<KEY>`).
+     *
+     * Leaving off this attribute still returns a list of the users spreadsheets in the `spreadsheets` property.
+     *
+     * @attribute key
+     * @type string
+     * @default ''
+     */
+    key: '',
+
+    /**
+     * Tab within a spreadsheet. For example, the first tab in a spreadsheet
+     * would be `tab="1"`.
+     *
+     * @attribute tabid
+     * @type number
+     * @default 1
+     */
+    tabid: 1,
+
+    /**
+     * A hint that the spreadsheet is published publicly in Google Docs. Used as a performance optimization.
+     * Make sure the sheet is also publicly viewable by anyone in the Share settings.
+     *
+     * @attribute published
+     * @type boolean
+     * @default false
+     */
+    published: false,
+
+    worksheetId_: null,
+
+    /**
+     * List of the user's spreadsheets. Shared across instances.
+     *
+     * @property spreadsheets
+     * @type array
+     */
+     spreadsheets: [],
+
+    /**
+     * The URL to open this spreadsheet in Google Sheets.
+     *
+     * @property openInGoogleDocsURL
+     * @readonly
+     * @type string
+     */
+    get openInGoogleDocsURL() {
+      var url = 'https://docs.google.com/spreadsheet/';
+      if (this.key) {
+        url += 'ccc?key=' + this.key;
+      }
+      //url += '#gid=' + this.gid;
+>>>>>>> 8cbfb155dd454c0f0cf548aed0fca05beaae6032
 
     is: 'google-sheets',
 
@@ -295,7 +360,7 @@ Fired when the spreadsheet's cell information is available.
       var oauthToken = gapi.auth.getToken();
 
       var headers = {
-        'Authorization': 'Bearer ' + oauthToken.access_token
+        'Authorization': 'Bearer ' + detail.user.getAuthResponse().access_token
       };
 
       this.$.listsheetsajax.headers = headers;
@@ -405,8 +470,6 @@ Fired when the spreadsheet's cell information is available.
         data: this.rows
       });
     }
-
   });
-
 })();
 </script>
