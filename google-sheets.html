@@ -125,7 +125,8 @@ Fired when the spreadsheet's cell information is available.
        */
       clientId: {
         type: String,
-        value: ''
+        value: '',
+        observer: '_configUpdate'
       },
 
       /**
@@ -147,7 +148,7 @@ Fired when the spreadsheet's cell information is available.
       tabId: {
         type: Number,
         value: 1,
-        observer: '_tabIdChanged'
+        observer: '_configUpdate'
       },
 
       /**
@@ -160,7 +161,8 @@ Fired when the spreadsheet's cell information is available.
        */
       published: {
         type: Boolean,
-        value: false
+        value: false,
+        observer: '_configUpdate'
       },
 
       _worksheetId: {
@@ -219,10 +221,6 @@ Fired when the spreadsheet's cell information is available.
         notify: true
       }
     },
-
-    observers: [
-      '_configUpdate(key published tabId clientId)'
-    ],
 
     _computeGoogleDocsUrl: function(key) {
       var url = 'https://docs.google.com/spreadsheet/';
