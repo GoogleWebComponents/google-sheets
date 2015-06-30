@@ -40,23 +40,38 @@ See [developers.google.com/google-apps/spreadsheets](https://developers.google.c
 
 <b>Example</b> - show a list of Map markers, using data-binding features inside Polymer:
 
-    <google-sheets
-      key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tab-id="1" rows="{{rows}}"
-      client-id="...">
-    </google-sheets>
-    <google-map>
-      <template is="dom-bind">
+    <template is="dom-bind">
+      <google-sheets>
+        key="0Anye-JMjUkZZdDBkMVluMEhZMmFGeHpYdDJJV1FBRWc" tab-id="1" rows="{{rows}}"
+        client-id="...">
+      </google-sheets>
+      <google-map>
         <google-map-marker latitude="{{gsx$lat.$t}}" longitude="{{gsx$lng.$t}}">
+      </google-map>
+    </template>
+
+<b>Example</b> - list a user's private spreadsheets. Authenticate with google-signin button.
+
+    <google-signin
+      client-id="1054047045356-j8pgqgls9vdef3rl09hapoicumbte0bo.apps.googleusercontent.com"
+      scopes="https://spreadsheets.google.com/feeds">
+    </google-signin>
+
+    <template is="dom-bind">
+      <google-sheets client-id="1054047045356-j8pgqgls9vdef3rl09hapoicumbte0bo.apps.googleusercontent.com"
+         key="1QMGizivw3UJ3-R9BFK7sfrXE0RL87dygk2C0RcuKoDY" tab-id="1"
+         spreadsheets="{{spreadsheets}}"></google-sheets>
+      <template is="dom-repeat" items="[[spreadsheets]]">
+        <p>{{item.title.$t}}</p>
       </template>
-    </google-map>
+    </template>
 
 @demo
 -->
 
-
 <dom-module id="google-sheets">
   <template>
-    <template if="{{!published}}">
+    <template is="dom-if" if="{{!published}}">
       <google-signin-aware client-id="{{clientId}}"
                      scopes="https://spreadsheets.google.com/feeds"
                      on-google-signin-aware-success="_onSignInSuccess"
@@ -84,7 +99,7 @@ See [developers.google.com/google-apps/spreadsheets](https://developers.google.c
   var rowDataCache_ = {};
 
   function generateCacheKey_() {
-    return this.worksheetId_ + '_'+ this.tabId;
+    return this._worksheetId + '_'+ this.tabId;
   }
 
   function getLink_(rel, links) {
@@ -111,14 +126,20 @@ See [developers.google.com/google-apps/spreadsheets](https://developers.google.c
 
     is: 'google-sheets',
 
-/**
-Fired when the spreadsheet's cell information is available.
+    /**
+     * Fired when the spreadsheet's cell information is available.
+     *
+     * @event google-sheet-data
+     * @param {Object} detail
+     * @param {Object} detail.data The data returned by the Spreadsheet API.
+     * @param {string} detail.type The type of data that was fetched.
+     *     One of 'spreadsheets', 'tab', 'rows' * to correspond to the feed type.
+     */
 
-@event google-sheet-data
-@param {Object} detail
-@param {Object} detail.data The data returned by the Spreadsheet API.
-@param {string} detail.type The type of data that was fetched. One of 'spreadsheets', 'tab', 'rows' to correspond to the feed type.
-*/
+    hostAttributes: {
+      hidden: true
+    },
+
     properties: {
       /**
        * A Google Developers client ID. Obtain from [console.developers.google.com](https://console.developers.google.com). Required for accessing a private spreadsheet. Optional if accessing a public spreadsheet.
@@ -165,12 +186,6 @@ Fired when the spreadsheet's cell information is available.
         observer: '_configUpdate'
       },
 
-      _worksheetId: {
-        type: String,
-        value: null,
-        readOnly: true
-      },
-
       /**
        * The fetched sheet corresponding to the `key` attribute.
        */
@@ -209,6 +224,7 @@ Fired when the spreadsheet's cell information is available.
       spreadsheets: {
         type: Array,
         readOnly: true,
+        notify: true,
         value: function() { return []; }
       },
 
@@ -221,6 +237,8 @@ Fired when the spreadsheet's cell information is available.
         notify: true
       }
     },
+
+    _worksheetId: null,
 
     _computeGoogleDocsUrl: function(key) {
       var url = 'https://docs.google.com/spreadsheet/';
@@ -246,7 +264,7 @@ Fired when the spreadsheet's cell information is available.
     },
 
     _tabIdChanged: function(newValue, oldValue) {
-      if (this.worksheetId_) {
+      if (this._worksheetId) {
         this._getCellRows();
       } else if (this.published) {
         this._keyChanged();
@@ -267,8 +285,7 @@ Fired when the spreadsheet's cell information is available.
       this.set('sheet.updated', new Date(this.sheet.updated.$t));
       this.set('sheet.authors', authors);
 
-      //this.worksheetId_ = this.sheet.id.$t.split('/').slice(-1)[0];
-      this._setWorksheetId_(this.sheet.id.$t.split('/').slice(-1)[0]);
+      this._worksheetId = this.sheet.id.$t.split('/').slice(-1)[0];
       this._getWorksheet();
     },
 
@@ -292,7 +309,7 @@ Fired when the spreadsheet's cell information is available.
     },
 
     _onSignInSuccess: function(e, detail) {
-      var oauthToken = gapi.auth.getToken();
+      var oauthToken = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse();
 
       var headers = {
         'Authorization': 'Bearer ' + oauthToken.access_token
@@ -323,7 +340,7 @@ Fired when the spreadsheet's cell information is available.
 
       var feed = e.target.lastResponse.feed;
 
-      this.spreadsheets = feed.entry;
+      this._setSpreadsheets(feed.entry);
 
       this.fire('google-sheet-data', {
         type: 'spreadsheets',
@@ -335,7 +352,7 @@ Fired when the spreadsheet's cell information is available.
         for (var i = 0, entry; entry = feed.entry[i]; ++i) {
           var altLink = getLink_('alternate', entry.link);
           if (altLink && altLink.href.indexOf(this.key) != -1) {
-            this.sheet = entry;
+            this._setSheet(entry);
             break;
           }
         }
@@ -343,11 +360,11 @@ Fired when the spreadsheet's cell information is available.
     },
 
     _getWorksheet: function() {
-      if (!this.worksheetId_) {
+      if (!this._worksheetId) {
         throw new Error('workesheetId was not given.');
       }
 
-      var url = SCOPE_ + '/worksheets/' + this.worksheetId_ +
+      var url = SCOPE_ + '/worksheets/' + this._worksheetId +
                 '/private/full/' + this.tabId;
       this.$.worksheetajax.url = url;
       this.$.worksheetajax.generateRequest();
@@ -371,7 +388,7 @@ Fired when the spreadsheet's cell information is available.
       }
 
       var url = SCOPE_ + '/list/' +
-                this.worksheetId_ + '/' + this.tabId +
+                this._worksheetId + '/' + this.tabId +
                 '/private/full';
       this.$.cellrowsajax.url = url;
       this.$.cellrowsajax.generateRequest();

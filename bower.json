@@ -1,6 +1,6 @@
 {
   "name": "google-sheets",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "homepage": "https://googlewebcomponents.github.io/google-sheets",
   "description": "Web components to interact with Google Sheets",
   "main": "google-sheets.html",
@@ -27,8 +27,8 @@
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
-    "web-component-tester": "*",
     "google-map": "GoogleWebComponents/google-map#^1.0.0",
-    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0"
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
+    "web-component-tester": "*"
   }
 }
