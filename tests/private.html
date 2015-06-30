@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Copyright (c) 2014 Google Inc. All rights reserved. -->
+<!-- Copyright (c) 2015 Google Inc. All rights reserved. -->
 <html>
 <head>
   <meta charset="utf-8">
@@ -16,7 +16,7 @@
 
 <div>
   <p>Tests live private spreadsheet data.</p>
-  <p>This test needs to be run manually, standalone in order to fetch an OAuth token.</p> 
+  <p>This test needs to be run manually, standalone in order to fetch an OAuth token.</p>
 
   <b>NOTES:</b><br>
   <li>run manually off of localhost:3000/google-sheets/tests/private.html. Can also run from port 8080.</li>
@@ -63,9 +63,9 @@ document.addEventListener('polymer-ready', function() {
           assert.equal(this.rows[0].title.$t, 'FIRST NAME', '"name" column was incorrect');
           assert.equal(this.rows[1].gsx$state.$t, 'OR', '"state" column was incorrect');
 
-          break;  
+          break;
         default:
-          // Noop        
+          // Noop
       }
 
       done();
